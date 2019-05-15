@@ -14,17 +14,17 @@ using namespace rpc::detail;
 
 
 struct msgpack_backend_impl : public backend::impl {
-    msgpack_backend_impl(server<rpc::backend::msgpack> *parent, std::string const &address, uint16_t port)
-        : parent_(parent),
-          io_(),
+    msgpack_backend_impl(std::shared_ptr<dispatcher<rpc::backend::msgpack>> disp, std::string const &address, uint16_t port)
+        : io_(),
+          disp_(disp),
           acceptor_(io_,
                     tcp::endpoint(ip::address::from_string(address), port)),
           socket_(io_),
           suppress_exceptions_(false) {}
 
-    msgpack_backend_impl(server<rpc::backend::msgpack> *parent, uint16_t port)
-        : parent_(parent),
-          io_(),
+    msgpack_backend_impl(std::shared_ptr<dispatcher<rpc::backend::msgpack>> disp, uint16_t port)
+        : io_(),
+          disp_(disp),
           acceptor_(io_, tcp::endpoint(tcp::v4(), port)),
           socket_(io_),
           suppress_exceptions_(false) {}
@@ -34,7 +34,7 @@ struct msgpack_backend_impl : public backend::impl {
             if (!ec) {
                 LOG_INFO("Accepted connection.");
                 auto s = std::make_shared<server_session>(
-                    parent_, &io_, std::move(socket_), parent_->getDispatcher(),
+                    this, &io_, std::move(socket_), disp_,
                     suppress_exceptions_);
                 s->start();
                 sessions_.push_back(s);
@@ -83,6 +83,7 @@ struct msgpack_backend_impl : public backend::impl {
     }
 
     server<rpc::backend::msgpack> *parent_;
+    std::shared_ptr<dispatcher<rpc::backend::msgpack>> disp_;
     io_service io_;
     ip::tcp::acceptor acceptor_;
     ip::tcp::socket socket_;
@@ -91,3 +92,12 @@ struct msgpack_backend_impl : public backend::impl {
     std::atomic_bool suppress_exceptions_;
     RPCLIB_CREATE_LOG_CHANNEL(server)
 };
+
+
+auto backend::msgpack::create(std::shared_ptr<rpc::detail::dispatcher<rpc::backend::msgpack>> disp, std::uint16_t port) -> std::unique_ptr<rpc::backend::impl> {
+    return std::make_unique<msgpack_backend_impl>(disp, port);
+}
+
+auto backend::msgpack::create(std::shared_ptr<rpc::detail::dispatcher<rpc::backend::msgpack>> disp, std::string const &address, std::uint16_t port) -> std::unique_ptr<rpc::backend::impl> {
+    return std::make_unique<msgpack_backend_impl>(disp, address, port);
+}

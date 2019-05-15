@@ -13,7 +13,7 @@ include(check_warning_flag)
 #
 option(RPCLIB_BUILD_TESTS 
   "Build unit RPCLIB_BUILD_TESTS." 
-  OFF)
+  ON)
 option(RPCLIB_GENERATE_COMPDB 
   "Generate compilation database. Useful for YCM." 
   OFF)
@@ -108,7 +108,7 @@ add_library(${PROJECT_NAME}
   ${RPCLIB_HEADERS})
 
 # Perform steps and checks required for MSVC support
-rpclib_msvc_support()
+rpclib_msvc_support(${PROJECT_NAME})
 
 set(RPCLIB_BUILD_FLAGS "") # reset flags
 

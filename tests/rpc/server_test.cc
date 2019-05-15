@@ -28,7 +28,7 @@ public:
     }
 
 protected:
-    rpc::server s;
+    rpc::server<rpc::backend::msgpack> s;
     std::atomic_int long_count, short_count;
 };
 
@@ -75,7 +75,7 @@ public:
     }
 
 protected:
-    rpc::server s;
+    rpc::server<rpc::backend::msgpack> s;
 };
 
 #ifndef RPCLIB_WIN32
@@ -155,7 +155,7 @@ public:
     }
 
 protected:
-    rpc::server s;
+    rpc::server<rpc::backend::msgpack> s;
     std::string str_utf8;
 };
 
@@ -165,15 +165,15 @@ TEST_F(dispatch_unicode, narrow_unicode) {
 }
 
 TEST(server_misc, single_param_ctor) {
-    rpc::server s(test_port);
+    rpc::server<rpc::backend::msgpack> s(test_port);
     s.async_run();
     rpc::client c("127.0.0.1", test_port);
 }
 
 TEST(server_misc, server_is_moveable) {
-    rpc::server s(test_port);
+    rpc::server<rpc::backend::msgpack> s(test_port);
     s.bind("foo", [](){});
-    std::vector<rpc::server> vec;
+    std::vector<rpc::server<rpc::backend::msgpack>> vec;
     vec.push_back(std::move(s));
     EXPECT_THROW(vec[0].bind("foo", [](){}), std::logic_error);
 }

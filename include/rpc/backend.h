@@ -10,6 +10,7 @@ namespace rpc {
 
 namespace detail {
 class server_session;
+template <typename T> class dispatcher;
 }
 
 namespace backend{
@@ -32,7 +33,7 @@ public:
     //! specified port.
     //!
     //! \param port The port number to listen on.
-    static auto create(std::uint16_t port) -> std::shared_ptr<impl>;
+    static auto create(std::shared_ptr<detail::dispatcher<rpc::backend::msgpack>> disp, std::uint16_t port) -> std::unique_ptr<impl>;
 
     //! \brief Constructs a server that listens on the specified address on
     //! the specified port.
@@ -40,7 +41,7 @@ public:
     //! \param address The address to bind to. This only works if oee of your
     //! network adapaters control the given address.
     //! \param port The port number to listen on.
-    static auto create(std::string const &address, std::uint16_t port) -> std::shared_ptr<impl>;
+    static auto create(std::shared_ptr<detail::dispatcher<rpc::backend::msgpack>> disp, std::string const &address, std::uint16_t port) -> std::unique_ptr<impl>;
 };
 
 }

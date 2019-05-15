@@ -18,7 +18,7 @@ public:
     this_handler_test() : s(test_port) {}
 
 protected:
-    rpc::server s;
+    rpc::server<rpc::backend::msgpack> s;
 };
 
 TEST_F(this_handler_test, set_error) {

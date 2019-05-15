@@ -19,7 +19,7 @@ public:
     this_session_test() : s(test_port) {}
 
 protected:
-    rpc::server s;
+    rpc::server<rpc::backend::msgpack> s;
 };
 
 TEST_F(this_session_test, post_exit) {

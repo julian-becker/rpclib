@@ -1,5 +1,5 @@
 
-function(rpclib_msvc_support)
+function(rpclib_msvc_support arg1)
   if(MSVC)
     # When building via conan, respect the compilation settings.
     if ("${CONAN_LINK_RUNTIME}" STREQUAL "/MT")
@@ -10,10 +10,11 @@ function(rpclib_msvc_support)
       message(FATAL_ERROR "Coverage is only supported with non-MS compilers")
     endif()
 
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
+    target_compile_definitions(${arg1} PRIVATE
       "WIN32_LEAN_AND_MEAN"
       "NOMINMAX"
       "VC_EXTRALEAN"
+      "_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING"
       "_CRT_SECURE_NO_WARNINGS"
       "_CRT_NONSTDC_NO_DEPRECATE"
       "_WIN32_WINNT=0x0501"

@@ -2,6 +2,7 @@
 
 #include "rpc/config.h"
 #include "rpc/server.h"
+#include "rpc/backend.h"
 #include "rpc/this_handler.h"
 #include "rpc/this_server.h"
 #include "rpc/this_session.h"
@@ -14,7 +15,7 @@ namespace detail {
 static constexpr std::size_t default_buffer_size =
     rpc::constants::DEFAULT_BUFFER_SIZE;
 
-server_session::server_session(server<rpc::backend::msgpack> *srv, RPCLIB_ASIO::io_service *io,
+server_session::server_session(backend::impl *srv, RPCLIB_ASIO::io_service *io,
                                RPCLIB_ASIO::ip::tcp::socket socket,
                                std::shared_ptr<dispatcher<rpc::backend::msgpack>> disp,
                                bool suppress_exceptions)

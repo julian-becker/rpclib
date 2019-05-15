@@ -123,8 +123,8 @@ private:
     void close_session(std::shared_ptr<detail::server_session> const& s);
 
 private:
-	std::unique_ptr<backend::impl> pimpl;
     std::shared_ptr<detail::dispatcher<Backend>> disp_;
+	std::unique_ptr<backend::impl> pimpl;
 };
 
 } /* rpc */

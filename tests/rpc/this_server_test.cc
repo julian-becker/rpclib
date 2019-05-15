@@ -19,7 +19,7 @@ public:
           c2("127.0.0.1", test_port) {}
 
 protected:
-    rpc::server s;
+    rpc::server<rpc::backend::msgpack> s;
     rpc::client c1;
     rpc::client c2;
 };

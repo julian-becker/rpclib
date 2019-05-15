@@ -25,7 +25,7 @@ public:
 
 protected:
     static const int test_port = rpc::constants::DEFAULT_PORT;
-    rpc::server s;
+    rpc::server<rpc::backend::msgpack> s;
     rpc::client c;
 };
 
@@ -59,7 +59,7 @@ TEST_F(server_session_test, session_id_unique) {
 }
 
 TEST(server_session_test_bug153, bug_153_crash_on_client_timeout) {
-    rpc::server s("127.0.0.1", rpc::constants::DEFAULT_PORT);
+    rpc::server<rpc::backend::msgpack> s("127.0.0.1", rpc::constants::DEFAULT_PORT);
     s.bind("bug_153", []() {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         return 0;

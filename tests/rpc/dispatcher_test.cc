@@ -1,7 +1,7 @@
 #include <functional>
 
 #include "gmock/gmock.h"
-
+#include "rpc/backend.h"
 #include "rpc/dispatcher.h"
 #include "testutils.h"
 
@@ -35,7 +35,7 @@ public:
     }
 
 protected:
-    rpc::detail::dispatcher dispatcher;
+    rpc::detail::dispatcher<rpc::backend::msgpack> dispatcher;
 };
 
 class dispatch_test : public binding_test {};

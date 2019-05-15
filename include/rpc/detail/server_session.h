@@ -24,7 +24,7 @@ namespace detail {
 
 class server_session : public async_writer {
 public:
-    server_session(server<rpc::backend::msgpack> *srv, RPCLIB_ASIO::io_service *io,
+    server_session(backend::impl *srv, RPCLIB_ASIO::io_service *io,
                    RPCLIB_ASIO::ip::tcp::socket socket,
                    std::shared_ptr<dispatcher<rpc::backend::msgpack>> disp, bool suppress_exceptions);
     void start();
@@ -35,7 +35,7 @@ private:
     void do_read();
 
 private:
-    server<rpc::backend::msgpack>* parent_;
+    backend::impl* parent_;
     RPCLIB_ASIO::io_service *io_;
     RPCLIB_ASIO::strand read_strand_;
     std::shared_ptr<dispatcher<rpc::backend::msgpack>> disp_;

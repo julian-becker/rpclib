@@ -24,12 +24,10 @@ namespace rpc {
 RPCLIB_CREATE_LOG_CHANNEL(server)
 
 template <>
-server<rpc::backend::msgpack>::server(uint16_t port)
-    
-    
-    : pimpl(nullptr)
-    // new rpc::backend::msgpack::create(this, port)
-    , disp_(std::make_shared<dispatcher<rpc::backend::msgpack>>()) {
+server<rpc::backend::msgpack>::server(uint16_t port)    
+    : pimpl(backend::msgpack::create(disp_, port))
+    , disp_(std::make_shared<dispatcher<rpc::backend::msgpack>>())
+{
     LOG_INFO("Created server on localhost:{}", port);
     pimpl->start_accept();
 }
@@ -41,8 +39,8 @@ server<rpc::backend::msgpack>::server(server&& other) noexcept {
 
 template <>
 server<rpc::backend::msgpack>::server(std::string const &address, uint16_t port)
-    : pimpl(nullptr), // new rpc::backend::msgpack::create(this, address, port)
-    disp_(std::make_shared<dispatcher<rpc::backend::msgpack>>()) {
+    : pimpl(backend::msgpack::create(disp_, address, port))
+    , disp_(std::make_shared<dispatcher<rpc::backend::msgpack>>()) {
     LOG_INFO("Created server on address {}:{}", address, port);
     pimpl->start_accept();
 }
