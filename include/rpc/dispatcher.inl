@@ -1,15 +1,16 @@
 
 namespace rpc {
 namespace detail {
-
-template <typename F> void dispatcher::bind(std::string const &name, F func) {
+template <typename Backend>
+template <typename F> void dispatcher<Backend>::bind(std::string const &name, F func) {
     enforce_unique_name(name);
     bind(name, func, typename detail::func_kind_info<F>::result_kind(),
          typename detail::func_kind_info<F>::args_kind());
 }
 
+template <typename Backend>
 template <typename F>
-void dispatcher::bind(std::string const &name, F func,
+void dispatcher<Backend>::bind(std::string const &name, F func,
                       detail::tags::void_result const &,
                       detail::tags::zero_arg const &) {
     enforce_unique_name(name);
@@ -21,8 +22,9 @@ void dispatcher::bind(std::string const &name, F func,
         }));
 }
 
+template <typename Backend>
 template <typename F>
-void dispatcher::bind(std::string const &name, F func,
+void dispatcher<Backend>::bind(std::string const &name, F func,
                       detail::tags::void_result const &,
                       detail::tags::nonzero_arg const &) {
     using detail::func_traits;
@@ -40,8 +42,9 @@ void dispatcher::bind(std::string const &name, F func,
         }));
 }
 
+template <typename Backend>
 template <typename F>
-void dispatcher::bind(std::string const &name, F func,
+void dispatcher<Backend>::bind(std::string const &name, F func,
                       detail::tags::nonvoid_result const &,
                       detail::tags::zero_arg const &) {
     using detail::func_traits;
@@ -56,8 +59,9 @@ void dispatcher::bind(std::string const &name, F func,
     }));
 }
 
+template <typename Backend>
 template <typename F>
-void dispatcher::bind(std::string const &name, F func,
+void dispatcher<Backend>::bind(std::string const &name, F func,
                       detail::tags::nonvoid_result const &,
                       detail::tags::nonzero_arg const &) {
     using detail::func_traits;

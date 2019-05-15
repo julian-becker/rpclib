@@ -13,18 +13,20 @@
 #include "rpc/dispatcher.h"
 #include "rpc/detail/async_writer.h"
 #include "rpc/detail/log.h"
+#include "rpc/backend.h"
 
 namespace rpc {
 
-class server;
+template <typename> class server;
+namespace backend { class msgpack; }
 
 namespace detail {
 
 class server_session : public async_writer {
 public:
-    server_session(server *srv, RPCLIB_ASIO::io_service *io,
+    server_session(server<rpc::backend::msgpack> *srv, RPCLIB_ASIO::io_service *io,
                    RPCLIB_ASIO::ip::tcp::socket socket,
-                   std::shared_ptr<dispatcher> disp, bool suppress_exceptions);
+                   std::shared_ptr<dispatcher<rpc::backend::msgpack>> disp, bool suppress_exceptions);
     void start();
 
     void close();
@@ -33,10 +35,10 @@ private:
     void do_read();
 
 private:
-    server* parent_;
+    server<rpc::backend::msgpack>* parent_;
     RPCLIB_ASIO::io_service *io_;
     RPCLIB_ASIO::strand read_strand_;
-    std::shared_ptr<dispatcher> disp_;
+    std::shared_ptr<dispatcher<rpc::backend::msgpack>> disp_;
     RPCLIB_MSGPACK::unpacker pac_;
     RPCLIB_MSGPACK::sbuffer output_buf_;
     const bool suppress_exceptions_;

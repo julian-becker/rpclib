@@ -25,6 +25,7 @@ namespace detail {
 
 //! \brief This class maintains a registry of functors associated with their
 //! names, and callable using a msgpack-rpc call pack.
+template <typename Backend>
 class dispatcher {
 public:
     //! \brief Binds a functor to a name so it becomes callable via RPC.

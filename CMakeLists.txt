@@ -93,6 +93,7 @@ set(DEP_SOURCES
 add_library(${PROJECT_NAME}
   lib/rpc/dispatcher.cc
   lib/rpc/server.cc
+  lib/rpc/backend.cc
   lib/rpc/client.cc
   lib/rpc/this_handler.cc
   lib/rpc/this_session.cc

@@ -16,7 +16,7 @@ server and client:
 using std::string;
 
 int main() {
-  rpc::server srv(8080);
+  rpc::server<rpc::backend::msgpack> srv(8080);
 
   srv.bind("echo", [](string const& s) {
     return string("> ") + s;

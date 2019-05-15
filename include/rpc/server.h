@@ -6,7 +6,7 @@
 #include "rpc/config.h"
 #include "rpc/msgpack.hpp"
 #include "rpc/dispatcher.h"
-
+#include "rpc/backend.h"
 #include "rpc/detail/pimpl.h"
 
 namespace rpc {
@@ -14,6 +14,8 @@ namespace rpc {
 namespace detail {
 class server_session;
 }
+
+
 
 //! \brief Implements a msgpack-rpc server. This is the main interfacing
 //! point with the library for creating servers.
@@ -25,8 +27,11 @@ class server_session;
 //! to allow binding functions before that. Use the `run` or `async_run`
 //! functions to start listening on the port.
 //! This class is not copyable, but moveable.
-class server {
+template <typename Backend>
+class server : public Backend {
 public:
+    using Backend::Backend;
+
     //! \brief Constructs a server that listens on the localhost on the
     //! specified port.
     //!
@@ -107,6 +112,10 @@ public:
     //! \brief Closes all sessions gracefully.
     void close_sessions();
 
+    auto getDispatcher() const -> std::shared_ptr<detail::dispatcher<Backend>> {
+        return disp_;
+    }
+
     friend class detail::server_session;
 
 private:
@@ -114,8 +123,8 @@ private:
     void close_session(std::shared_ptr<detail::server_session> const& s);
 
 private:
-	RPCLIB_DECLARE_PIMPL()
-    std::shared_ptr<detail::dispatcher> disp_;
+	std::unique_ptr<backend::impl> pimpl;
+    std::shared_ptr<detail::dispatcher<Backend>> disp_;
 };
 
 } /* rpc */

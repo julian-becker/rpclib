@@ -2,18 +2,21 @@
 #include "format.h"
 #include "rpc/detail/client_error.h"
 #include "rpc/this_handler.h"
+#include "rpc/backend.h"
 
 namespace rpc {
 namespace detail {
 
 using detail::response;
 
-void dispatcher::dispatch(RPCLIB_MSGPACK::sbuffer const &msg) {
+template <>
+void dispatcher<rpc::backend::msgpack>::dispatch(RPCLIB_MSGPACK::sbuffer const &msg) {
     auto unpacked = RPCLIB_MSGPACK::unpack(msg.data(), msg.size());
     dispatch(unpacked.get());
 }
 
-response dispatcher::dispatch(RPCLIB_MSGPACK::object const &msg,
+template <>
+response dispatcher<rpc::backend::msgpack>::dispatch(RPCLIB_MSGPACK::object const &msg,
                               bool suppress_exceptions) {
     switch (msg.via.array.size) {
     case 3:
@@ -25,7 +28,8 @@ response dispatcher::dispatch(RPCLIB_MSGPACK::object const &msg,
     }
 }
 
-response dispatcher::dispatch_call(RPCLIB_MSGPACK::object const &msg,
+template <>
+response dispatcher<rpc::backend::msgpack>::dispatch_call(RPCLIB_MSGPACK::object const &msg,
                                    bool suppress_exceptions) {
     call_t the_call;
     msg.convert(the_call);
@@ -84,7 +88,8 @@ response dispatcher::dispatch_call(RPCLIB_MSGPACK::object const &msg,
                                name, args.via.array.size));
 }
 
-response dispatcher::dispatch_notification(RPCLIB_MSGPACK::object const &msg,
+template <>
+response dispatcher<rpc::backend::msgpack>::dispatch_notification(RPCLIB_MSGPACK::object const &msg,
                                            bool suppress_exceptions) {
     notification_t the_call;
     msg.convert(the_call);
@@ -117,7 +122,8 @@ response dispatcher::dispatch_notification(RPCLIB_MSGPACK::object const &msg,
     return response::empty();
 }
 
-void dispatcher::enforce_arg_count(std::string const &func, std::size_t found,
+template <>
+void dispatcher<rpc::backend::msgpack>::enforce_arg_count(std::string const &func, std::size_t found,
                                    std::size_t expected) {
     using detail::client_error;
     if (found != expected) {
@@ -130,7 +136,8 @@ void dispatcher::enforce_arg_count(std::string const &func, std::size_t found,
     }
 }
 
-void dispatcher::enforce_unique_name(std::string const &func) {
+template <>
+void dispatcher<rpc::backend::msgpack>::enforce_unique_name(std::string const &func) {
     auto pos = funcs_.find(func);
     if (pos != end(funcs_)) {
         throw std::logic_error(
