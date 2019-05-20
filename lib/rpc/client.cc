@@ -25,8 +25,9 @@ namespace rpc {
 
 static constexpr uint32_t default_buffer_size = rpc::constants::DEFAULT_BUFFER_SIZE;
 
-struct client::impl {
-    impl(client *parent, std::string const &addr, uint16_t port)
+template <>
+struct client<rpc::backend::msgpack_client>::impl {
+    impl(client<rpc::backend::msgpack_client> *parent, std::string const &addr, uint16_t port)
         : parent_(parent),
           io_(),
           strand_(io_),
@@ -119,7 +120,7 @@ struct client::impl {
             });
     }
 
-    client::connection_state get_connection_state() const { return state_; }
+    client<rpc::backend::msgpack_client>::connection_state get_connection_state() const { return state_; }
 
     //! \brief Waits for the write queue and writes any buffers to the network
     //! connection. Should be executed throught strand_.
@@ -142,7 +143,7 @@ struct client::impl {
     using call_t =
         std::pair<std::string, std::promise<RPCLIB_MSGPACK::object_handle>>;
 
-    client *parent_;
+    client<rpc::backend::msgpack_client> *parent_;
     RPCLIB_ASIO::io_service io_;
     RPCLIB_ASIO::strand strand_;
     std::atomic<int> call_idx_; /// The index of the last call made
@@ -154,13 +155,15 @@ struct client::impl {
     std::condition_variable conn_finished_;
     std::mutex mut_connection_finished_;
     std::thread io_thread_;
-    std::atomic<client::connection_state> state_;
+    std::atomic<client<rpc::backend::msgpack_client>::connection_state> state_;
     std::shared_ptr<detail::async_writer> writer_;
     nonstd::optional<int64_t> timeout_;
     RPCLIB_CREATE_LOG_CHANNEL(client)
 };
 
-client::client(std::string const &addr, uint16_t port)
+
+template <>
+client<rpc::backend::msgpack_client>::client(std::string const &addr, uint16_t port)
     : pimpl(new client::impl(this, addr, port)) {
     tcp::resolver resolver(pimpl->io_);
     auto endpoint_it =
@@ -174,7 +177,8 @@ client::client(std::string const &addr, uint16_t port)
     pimpl->io_thread_ = std::move(io_thread);
 }
 
-void client::wait_conn() {
+template <>
+void client<rpc::backend::msgpack_client>::wait_conn() {
     std::unique_lock<std::mutex> lock(pimpl->mut_connection_finished_);
     if (!pimpl->is_connected_) {
         if (auto timeout = pimpl->timeout_) {
@@ -191,12 +195,14 @@ void client::wait_conn() {
     }
 }
 
-int client::get_next_call_idx() {
+template <>
+int client<rpc::backend::msgpack_client>::get_next_call_idx() {
     ++(pimpl->call_idx_);
     return pimpl->call_idx_;
 }
 
-void client::post(std::shared_ptr<RPCLIB_MSGPACK::sbuffer> buffer, int idx,
+template <>
+void client<rpc::backend::msgpack_client>::post(std::shared_ptr<RPCLIB_MSGPACK::sbuffer> buffer, int idx,
                   std::string const &func_name,
                   std::shared_ptr<rsp_promise> p) {
     pimpl->strand_.post([=]() {
@@ -206,42 +212,50 @@ void client::post(std::shared_ptr<RPCLIB_MSGPACK::sbuffer> buffer, int idx,
     });
 }
 
-void client::post(RPCLIB_MSGPACK::sbuffer *buffer) {
+template <>
+void client<rpc::backend::msgpack_client>::post(RPCLIB_MSGPACK::sbuffer *buffer) {
     pimpl->strand_.post([=]() {
         pimpl->write(std::move(*buffer));
         delete buffer;
     });
 }
 
-client::connection_state client::get_connection_state() const {
+template <>
+client<rpc::backend::msgpack_client>::connection_state client<rpc::backend::msgpack_client>::get_connection_state() const {
     return pimpl->get_connection_state();
 }
 
-nonstd::optional<int64_t> client::get_timeout() const {
+template <>
+nonstd::optional<int64_t> client<rpc::backend::msgpack_client>::get_timeout() const {
     return pimpl->get_timeout();
 }
 
-void client::set_timeout(int64_t value) {
+template <>
+void client<rpc::backend::msgpack_client>::set_timeout(int64_t value) {
     pimpl->set_timeout(value);
 }
 
-void client::clear_timeout() {
+template <>
+void client<rpc::backend::msgpack_client>::clear_timeout() {
     pimpl->clear_timeout();
 }
 
-void client::wait_all_responses() {
+template <>
+void client<rpc::backend::msgpack_client>::wait_all_responses() {
     for (auto &c : pimpl->ongoing_calls_) {
         c.second.second.get_future().wait();
     }
 }
 
-RPCLIB_NORETURN void client::throw_timeout(std::string const& func_name) {
+template <>
+RPCLIB_NORETURN void client<rpc::backend::msgpack_client>::throw_timeout(std::string const& func_name) {
     throw rpc::timeout(
         RPCLIB_FMT::format("Timeout of {}ms while calling RPC function '{}'",
                            *get_timeout(), func_name));
 }
 
-client::~client() {
+template <>
+client<rpc::backend::msgpack_client>::~client() {
     pimpl->io_.stop();
     pimpl->io_thread_.join();
 }

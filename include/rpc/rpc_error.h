@@ -26,7 +26,7 @@ public:
     virtual RPCLIB_MSGPACK::object_handle &get_error();
 
 private:
-    friend class client;
+    template <typename> friend class client;
     rpc_error(std::string const &what_arg, std::string const &function_name,
               std::shared_ptr<RPCLIB_MSGPACK::object_handle> o);
 
@@ -44,7 +44,7 @@ public:
     const char *what() const noexcept override;
 
 private:
-    friend class client;
+    template <typename> friend class client;
     explicit timeout(std::string const &what_arg);
     std::string formatted;
 };

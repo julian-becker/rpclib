@@ -8,6 +8,7 @@
 #include "rpc/config.h"
 #include "rpc/detail/log.h"
 #include "rpc/detail/pimpl.h"
+#include "rpc/backend.h"
 #include "rpc/msgpack.hpp"
 
 namespace rpc {
@@ -20,6 +21,7 @@ namespace rpc {
 //! functions. This class supports calling functions synchronously and
 //! asynchronously. When the client object is created, it initiates connecting
 //! to the given server asynchronically and disconnects when it is destroyed.
+template <typename Backend>
 class client {
 public:
     //! \brief Constructs a client.

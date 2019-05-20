@@ -44,6 +44,8 @@ public:
     static auto create(std::shared_ptr<detail::dispatcher<rpc::backend::msgpack>> disp, std::string const &address, std::uint16_t port) -> std::unique_ptr<impl>;
 };
 
+class msgpack_client {};
+
 }
 
 }

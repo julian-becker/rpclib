@@ -20,8 +20,8 @@ public:
 
 protected:
     rpc::server<rpc::backend::msgpack> s;
-    rpc::client c1;
-    rpc::client c2;
+    rpc::client<rpc::backend::msgpack_client> c1;
+    rpc::client<rpc::backend::msgpack_client> c2;
 };
 
 TEST_F(this_server_test, stop) {
@@ -31,7 +31,7 @@ TEST_F(this_server_test, stop) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     EXPECT_EQ(c1.get_connection_state(),
-              client::connection_state::disconnected);
+              client<rpc::backend::msgpack_client>::connection_state::disconnected);
     EXPECT_EQ(c2.get_connection_state(),
-              client::connection_state::disconnected);
+              client<rpc::backend::msgpack_client>::connection_state::disconnected);
 }

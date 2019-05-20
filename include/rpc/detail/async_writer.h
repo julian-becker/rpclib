@@ -13,7 +13,7 @@
 namespace rpc {
     
 
-class client;
+template <typename> class client;
 
 namespace detail {
 
@@ -73,7 +73,7 @@ public:
         do_write();
     }
 
-    friend class rpc::client;
+    template <typename> friend class rpc::client;
 
 protected:
     template <typename Derived>

@@ -26,7 +26,7 @@ public:
 protected:
     static const int test_port = rpc::constants::DEFAULT_PORT;
     rpc::server<rpc::backend::msgpack> s;
-    rpc::client c;
+    rpc::client<rpc::backend::msgpack_client> c;
 };
 
 TEST_F(server_session_test, consume_big_param) {
@@ -45,14 +45,14 @@ TEST_F(server_session_test, connection_closed_properly) {
 	const unsigned max_tries = 1000;
 #endif
     for (unsigned counter = 0; counter < max_tries; ++counter) {
-        rpc::client client("localhost", rpc::constants::DEFAULT_PORT);
+        rpc::client<rpc::backend::msgpack_client> client("localhost", rpc::constants::DEFAULT_PORT);
         auto response = client.call("func");
     }
     // no crash is enough
 }
 
 TEST_F(server_session_test, session_id_unique) {
-    rpc::client c2("localhost", rpc::constants::DEFAULT_PORT);
+    rpc::client<rpc::backend::msgpack_client> c2("localhost", rpc::constants::DEFAULT_PORT);
     auto sid1 = c.call("get_sid").as<rpc::session_id_t>();
     auto sid2 = c2.call("get_sid").as<rpc::session_id_t>();
     EXPECT_NE(sid1, sid2);
@@ -66,7 +66,7 @@ TEST(server_session_test_bug153, bug_153_crash_on_client_timeout) {
     });
     s.async_run();
 
-    auto client = std::unique_ptr<rpc::client>(new rpc::client("localhost", rpc::constants::DEFAULT_PORT));
+    auto client = std::unique_ptr<rpc::client<rpc::backend::msgpack_client>>(new rpc::client<rpc::backend::msgpack_client>("localhost", rpc::constants::DEFAULT_PORT));
     client->set_timeout(5);
   
     try {

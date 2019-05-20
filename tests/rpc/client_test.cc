@@ -34,14 +34,14 @@ protected:
 };
 
 TEST_F(client_test, instantiation) {
-    rpc::client client("127.0.0.1", test_port);
+    rpc::client<rpc::backend::msgpack_client> client("127.0.0.1", test_port);
 }
 
 TEST_F(client_test, call) {
     EXPECT_CALL(md, dummy_void_zeroarg());
     EXPECT_CALL(md, dummy_void_singlearg(5));
     EXPECT_CALL(md, dummy_void_multiarg(5, 6));
-    rpc::client client("127.0.0.1", test_port);
+    rpc::client<rpc::backend::msgpack_client> client("127.0.0.1", test_port);
     client.call("dummy_void_zeroarg");
     client.call("dummy_void_singlearg", 5);
     client.call("dummy_void_multiarg", 5, 6);
@@ -49,14 +49,14 @@ TEST_F(client_test, call) {
 
 TEST_F(client_test, notification) {
     EXPECT_CALL(md, dummy_void_zeroarg());
-    rpc::client client("127.0.0.1", test_port);
+    rpc::client<rpc::backend::msgpack_client> client("127.0.0.1", test_port);
     client.send("dummy_void_zeroarg");
     client.wait_all_responses();
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
 TEST_F(client_test, large_return) {
-    rpc::client client("127.0.0.1", test_port);
+    rpc::client<rpc::backend::msgpack_client> client("127.0.0.1", test_port);
     std::size_t blob_size = 2 << 10 << 10;
     for (int i = 0; i < 4; ++i) {
         client.call("large_return", blob_size);
@@ -66,7 +66,7 @@ TEST_F(client_test, large_return) {
 }
 
 TEST_F(client_test, timeout_setting_works) {
-    rpc::client client("127.0.0.1", test_port);
+    rpc::client<rpc::backend::msgpack_client> client("127.0.0.1", test_port);
     EXPECT_FALSE(client.get_timeout());
 
     const uint64_t short_timeout = 50;
@@ -81,7 +81,7 @@ TEST_F(client_test, timeout_setting_works) {
 }
 
 TEST_F(client_test, timeout_right_msg) {
-    rpc::client client("127.0.0.1", test_port);
+    rpc::client<rpc::backend::msgpack_client> client("127.0.0.1", test_port);
     const uint64_t short_timeout = 50;
     try {
         client.set_timeout(short_timeout);
@@ -98,7 +98,7 @@ TEST_F(client_test, timeout_right_msg) {
 }
 
 TEST_F(client_test, timeout_clear) {
-    rpc::client client("127.0.0.1", test_port);
+    rpc::client<rpc::backend::msgpack_client> client("127.0.0.1", test_port);
     EXPECT_FALSE(client.get_timeout());
     client.set_timeout(50);
     EXPECT_EQ(50, *client.get_timeout());
@@ -107,7 +107,7 @@ TEST_F(client_test, timeout_clear) {
 }
 
 TEST(client_test2, timeout_while_connection) {
-    rpc::client client("localhost", rpc::constants::DEFAULT_PORT);
+    rpc::client<rpc::backend::msgpack_client> client("localhost", rpc::constants::DEFAULT_PORT);
     client.set_timeout(50);
     // this client never connects, so this tests the timout in wait_conn()
     EXPECT_THROW(client.call("whatev"), rpc::timeout);

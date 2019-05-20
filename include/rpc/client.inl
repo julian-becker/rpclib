@@ -1,7 +1,8 @@
 namespace rpc {
 
+template <typename Backend>
 template <typename... Args>
-RPCLIB_MSGPACK::object_handle client::call(std::string const &func_name,
+RPCLIB_MSGPACK::object_handle client<Backend>::call(std::string const &func_name,
                                     Args... args) {
     RPCLIB_CREATE_LOG_CHANNEL(client)
     auto future = async_call(func_name, std::forward<Args>(args)...);
@@ -15,9 +16,10 @@ RPCLIB_MSGPACK::object_handle client::call(std::string const &func_name,
     return future.get();
 }
 
+template <typename Backend>
 template <typename... Args>
 std::future<RPCLIB_MSGPACK::object_handle>
-client::async_call(std::string const &func_name, Args... args) {
+client<Backend>::async_call(std::string const &func_name, Args... args) {
     RPCLIB_CREATE_LOG_CHANNEL(client)
     wait_conn();
     using RPCLIB_MSGPACK::object;
@@ -48,8 +50,9 @@ client::async_call(std::string const &func_name, Args... args) {
 //! \note This function returns when the notification is written to the
 //! socket.
 //! \tparam Args THe types of the arguments.
+template <typename Backend>
 template <typename... Args>
-void client::send(std::string const &func_name, Args... args) {
+void client<Backend>::send(std::string const &func_name, Args... args) {
     RPCLIB_CREATE_LOG_CHANNEL(client)
     LOG_DEBUG("Sending notification {}", func_name);
 
